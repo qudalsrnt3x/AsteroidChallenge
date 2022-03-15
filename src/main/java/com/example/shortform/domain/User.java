@@ -1,15 +1,20 @@
 package com.example.shortform.domain;
 
+import com.example.shortform.dto.resonse.ChatRoomMemberDto;
+import com.example.shortform.dto.resonse.MemberResponseDto;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@Setter
 @Entity
 public class User extends Timestamped{
     @Id
@@ -29,12 +34,38 @@ public class User extends Timestamped{
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "point", nullable = false)
-    private int point;
-
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "level_id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "level_id")
     private Level level;
+
+    @Column(name = "yesterday_rank", nullable = false)
+    private int yesterdayRank;
+
+    @Column(name = "rank_status")
+    private String rankStatus;
+
+
+    @Column(name = "point", nullable = false)
+    private int rankingPoint;
+
+    @Column(name = "yesterday_point")
+    private int yesterdayRankingPoint;
+
+    @Column(name = "role")
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
+    @Setter
+    private boolean emailVerified;
+
+    private String emailCheckToken;
+
+    private LocalDateTime emailCheckTokenGeneratedAt;
+
+    // kakao
+    private String provider;
+
+    private String providerId;
 
     @OneToMany(mappedBy = "user", orphanRemoval = true)
     private List<UserChallenge> userChallenges = new ArrayList<>();
@@ -48,7 +79,73 @@ public class User extends Timestamped{
     @OneToMany(mappedBy = "user", orphanRemoval = true)
     private List<Challenge> challenges = new ArrayList<>();
 
-    public void setChallenges(List<Challenge> challenges) {
-        this.challenges = challenges;
+    @OneToMany(mappedBy = "user", orphanRemoval = true)
+    private List<UserChatRoom> userChatRooms = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", orphanRemoval = true)
+    private List<ChatMessage> messages = new ArrayList<>();
+
+    public void generateEmailCheckToken() {
+        this.emailCheckToken = UUID.randomUUID().toString();
+        this.emailCheckTokenGeneratedAt = LocalDateTime.now();
+    }
+
+    public boolean isValidToken(String token) {
+        return this.emailCheckToken.equals(token);
+    }
+
+    public boolean canSendConfirmEmail() {
+        return this.emailCheckTokenGeneratedAt.isBefore(LocalDateTime.now().minusHours(1));
+    }
+
+    public void changeTempPassword(String tempPassword) {
+        this.password = tempPassword;
+    }
+
+    public void setProfileImage(String profileImage) {
+        this.profileImage = profileImage;
+    }
+
+    public void setPassword(String encPassword) {
+        this.password = encPassword;
+    }
+
+    public void setRankingPoint(int point) {
+        this.rankingPoint = point;
+    }
+
+
+    public MemberResponseDto toMemberResponse() {
+        return MemberResponseDto.builder()
+                .userId(id)
+                .nickname(nickname)
+                .profileImage(profileImage)
+                .levelName(level.getName())
+                .build();
+    }
+
+    public ChatRoomMemberDto toChatMemberResponse() {
+        return ChatRoomMemberDto.builder()
+                .profileUrl(profileImage)
+                .email(email)
+                .userId(id)
+                .nickname(nickname)
+                .levelName(level.getName())
+                .build();
+    }
+
+    public Object getRole() {
+        return this.role;
+    }
+
+    @PrePersist
+    public void prePersist(){
+        this.yesterdayRank = -1;
+        this.rankStatus = "new";
+    }
+
+
+    public void changeLevel(Level level) {
+        this.level = level;
     }
 }
