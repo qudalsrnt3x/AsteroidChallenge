@@ -9,8 +9,8 @@ branches:
 # Travis CI server Home
 cache:
   directories:
-    - '$HOME/.m2/repository'
-    - '$HOME/.gradle'
+    - "$HOME/.m2/repository"
+    - "$HOME/.gradle"
 
 script: "./gradlew clean build"
 
@@ -54,7 +54,6 @@ deploy:
     deployment_group: asteroid-webservice-group
     region: ap-northeast-2
     wait-until-deployed: true
-
 # CI 실행 완료 시 메일로 알람
 #notifications:
 #  email:
