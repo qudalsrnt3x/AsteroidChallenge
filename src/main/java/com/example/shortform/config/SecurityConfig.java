@@ -53,7 +53,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/category/**", "/users/**", "/chat/**").permitAll()
                 .antMatchers("/ranking/**", "/posts/**", "/mypage/**").permitAll()
                 .antMatchers("/pub/**", "/sub/**").permitAll()
-                .antMatchers("/h2-console/**").permitAll()
+                .antMatchers("/h2-console/**", "/profile").permitAll()
                 .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                 .antMatchers("/chatting/**").permitAll()
                 .antMatchers("/chat/message").permitAll()
