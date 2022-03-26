@@ -176,6 +176,9 @@ public class UserService {
         if (!passwordEncoder.matches(signinRequestDto.getPassword(), userEntity.getPassword()))
             throw new InvalidException("비밀번호가 일치하지 않습니다.");
 
+        if (!userEntity.isEmailVerified())
+            throw new InvalidException("이메일 인증을 해주세요");
+
         // 토큰 정보 생성
         TokenDto token = jwtAuthenticationProvider.createToken(userEntity);
         token.setEmail(signinRequestDto.getEmail());
