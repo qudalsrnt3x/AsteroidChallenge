@@ -36,7 +36,7 @@ public class ChatMessageService {
     // 헤더에서 추출한 destination을 이용해 roomId 값 리턴
     public String getRoomId(String destination) {
         int lastIndex = destination.lastIndexOf('/');
-        System.out.println("룸 아이디 destination" + destination);
+        //System.out.println("룸 아이디 destination" + destination);
 
         if (lastIndex != -1) {
             return (destination.substring(lastIndex + 1));
