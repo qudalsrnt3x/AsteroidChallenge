@@ -149,12 +149,14 @@ public class ChallengeService {
             Notice notice = Notice.builder()
                     .noticeType(Notice.NoticeType.FIRST)
                     .is_read(false)
+                    .increasePoint(5)
                     .user(user)
                     .build();
 
-            user.setRankingPoint(user.getRankingPoint() + 5);
             noticeRepository.save(notice);
+            user.setRankingPoint(user.getRankingPoint() + 5);
             user.setNewbie(false);
+            userRepository.save(user);
         }
 
         return challenge.getId();
@@ -225,14 +227,14 @@ public class ChallengeService {
             }
 
             authChallenge.setCurrentMember(challenge.getCurrentMember());
-            authChallengeRepository.save(authChallenge);
+                authChallengeRepository.save(authChallenge);
 
-            int division = 1;
-            int divisor = 0;
-            double percentage_d = 0.0;
-            int percentage;
+                int division = 1;
+                int divisor = 0;
+                double percentage_d = 0.0;
+                int percentage;
 
-            if(!date.isAfter(now)) {
+               if(!date.isAfter(now)) {
                 authChallenge.setCurrentMember(challenge.getCurrentMember());
                 division = authChallenge.getCurrentMember();
                 divisor = authChallenge.getAuthMember();
@@ -449,6 +451,7 @@ public class ChallengeService {
             Notice notice = Notice.builder()
                     .noticeType(Notice.NoticeType.FIRST)
                     .is_read(false)
+                    .increasePoint(5)
                     .user(user)
                     .build();
 
@@ -652,6 +655,7 @@ public class ChallengeService {
             Notice notice = Notice.builder()
                     .noticeType(Notice.NoticeType.FIRST)
                     .is_read(false)
+                    .increasePoint(5)
                     .user(user)
                     .build();
 
