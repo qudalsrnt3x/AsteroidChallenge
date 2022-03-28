@@ -17,12 +17,12 @@ function switch_proxy() {
       KILL_PORT=8445
       IDLE_PID=$(lsof -ti tcp:${KILL_PORT})
       echo "> ${KILL_PORT} 포트를 종료합니다."
-      sudo kill -15 ${IDLE_PID}
+      kill -15 ${IDLE_PID}
     else
       KILL_PORT=8444
       IDLE_PID=$(lsof -ti tcp:${KILL_PORT})
       echo "> ${KILL_PORT} 포트를 종료합니다."
-      sudo kill -15 ${IDLE_PID}
+      kill -15 ${IDLE_PID}
     fi
 
     echo "> 엔진엑스 Reload"
