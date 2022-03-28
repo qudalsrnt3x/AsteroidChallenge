@@ -26,7 +26,7 @@ echo "> $JAR_NAME 실행"
 IDLE_PROFILE=$(find_idle_profile)
 
 echo "> $JAR_NAME 를 profile=$IDLE_PROFILE 로 실행합니다."
-nohup sudo java -jar \
+sudo nohup java -jar \
   -Dspring.config.location=/home/ec2-user/app/application.yml,/home/ec2-user/app/application-$IDLE_PROFILE.yml,/home/ec2-user/app/application-aws.yml \
   -Dspring.profiles.active=$IDLE_PROFILE \
   -Duser.timezone=Asia/Seoul \
