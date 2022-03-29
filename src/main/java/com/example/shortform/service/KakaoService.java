@@ -153,6 +153,7 @@ public class KakaoService {
                     .rankingPoint(10)
                     .yesterdayRankingPoint(10)
                     .emailVerified(true)
+                    .newbie(true)
                     .level(level)
                     .role(Role.ROLE_USER)
                     .provider(provider)
