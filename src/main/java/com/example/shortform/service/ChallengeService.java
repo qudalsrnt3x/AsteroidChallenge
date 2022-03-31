@@ -162,7 +162,8 @@ public class ChallengeService {
         return challenge.getId();
     }
 
-    @Scheduled(cron = "0 0 0 * * *")
+    @Scheduled(cron = "0 10 0 * * *")
+    @org.springframework.transaction.annotation.Transactional
     public void saveReport(){
         List<Challenge> challenges = challengeRepository.findAll();
         LocalDate yesterday = LocalDate.now().minusDays(1);
