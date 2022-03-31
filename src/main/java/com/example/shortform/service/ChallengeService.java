@@ -64,8 +64,8 @@ public class ChallengeService {
 
     @Transactional
     public Long postChallenge(ChallengeRequestDto requestDto,
-                                              PrincipalDetails principal,
-                                            List<MultipartFile> multipartFiles) throws IOException, ParseException {
+                              PrincipalDetails principal,
+                              List<MultipartFile> multipartFiles) throws IOException, ParseException {
 
         // 카테고리 받아오기
         Category category = categoryRepository.findByName(requestDto.getCategory());
@@ -162,7 +162,6 @@ public class ChallengeService {
     }
 
     @Scheduled(cron = "0 0 0 * * *")
-    @org.springframework.transaction.annotation.Transactional
     public void saveReport(){
         List<Challenge> challenges = challengeRepository.findAll();
         LocalDate today = LocalDate.now();
@@ -231,10 +230,10 @@ public class ChallengeService {
             double percentage_d = 0.0;
             int percentage;
 
-           if(!date.isAfter(now)) {
-            //authChallenge.setCurrentMember(challenge.getCurrentMember());
-            division = authChallenge.getCurrentMember();
-            divisor = authChallenge.getAuthMember();
+            if(!date.isAfter(now)) {
+                //authChallenge.setCurrentMember(challenge.getCurrentMember());
+                division = authChallenge.getCurrentMember();
+                divisor = authChallenge.getAuthMember();
             }
 
             percentage_d = ( (double) divisor / (double) division ) * 100.0;
@@ -266,31 +265,6 @@ public class ChallengeService {
             challenge.setStatus(ChallengeStatus.SUCCESS);
             return "완료";
         }
-    }
-
-    public ChallengePageResponseDto getChallenges(Pageable pageable) throws ParseException, InternalServerException {
-        Page<Challenge> challengePage = challengeRepository.findAll(pageable);
-        List<ChallengesResponseDto> challengesResponseDtos = new ArrayList<>();
-
-
-        for(Challenge challenge: challengePage){
-
-            List<String> challengeImages = new ArrayList<>();
-            List<ImageFile> ImageFiles =  challenge.getChallengeImage();
-
-            for(ImageFile image:ImageFiles){
-                challengeImages.add(image.getFilePath());
-            }
-            String challengeStatus = challengeStatus(challenge);
-            ChallengesResponseDto responseDto = new ChallengesResponseDto(challenge, challengeImages, challengePage.hasNext());
-            responseDto.setStatus(challengeStatus);
-            challengesResponseDtos.add(responseDto);
-        }
-        ChallengePageResponseDto challengePageResponseDto = ChallengePageResponseDto.builder()
-                .challengeList(challengesResponseDtos)
-                .next(challengePage.hasNext())
-                .totalCnt(challengePage.getTotalElements()).build();
-        return challengePageResponseDto;
     }
 
     public List<ChallengesResponseDto> recommendChallenges(Long challengeId, PrincipalDetails principalDetails) throws ParseException {
@@ -360,31 +334,14 @@ public class ChallengeService {
         return challengeResponseDto;
     }
 
+    public ChallengePageResponseDto getChallenges(Pageable pageable) throws ParseException, InternalServerException {
+        Page<Challenge> challengePage = challengeRepository.findAll(pageable);
+        return getChallengePageResponseDto(challengePage);
+    }
 
     public ChallengePageResponseDto getCategoryChallenge(Long categoryId, Pageable pageable) throws ParseException, InternalServerException {
         Page<Challenge> challengePage = challengeRepository.findAllByCategoryId(categoryId, pageable);
-        List<ChallengesResponseDto> challengesResponseDtos = new ArrayList<>();
-
-        for(Challenge challenge: challengePage){
-            List<String> challengeImages = new ArrayList<>();
-            List<ImageFile> ImageFiles =  challenge.getChallengeImage();
-
-            for(ImageFile image:ImageFiles){
-                challengeImages.add(image.getFilePath());
-            }
-            String status = challengeStatus(challenge);
-
-            ChallengesResponseDto responseDto = new ChallengesResponseDto(challenge, challengeImages);
-            responseDto.setStatus(status);
-            challengesResponseDtos.add(responseDto);
-        }
-        ChallengePageResponseDto challengePageResponseDto = ChallengePageResponseDto.builder()
-                .challengeList(challengesResponseDtos)
-                .next(challengePage.hasNext())
-                .totalCnt(challengePage.getTotalElements())
-                .build();
-
-        return challengePageResponseDto;
+        return getChallengePageResponseDto(challengePage);
     }
 
     public ChallengePageResponseDto getKeywordChallenge(String keyword, Pageable pageable) throws ParseException, InternalServerException {
@@ -397,7 +354,11 @@ public class ChallengeService {
                     .build();
         }
         Page<Challenge> challengePage = challengeRepository.searchList(searchKeyword, pageable);
-        List<ChallengesResponseDto> challengesResponseDtos = new ArrayList<>();
+        return getChallengePageResponseDto(challengePage);
+    }
+
+    public ChallengePageResponseDto getChallengePageResponseDto(Page<Challenge> challengePage) throws ParseException {
+        List<ChallengesResponseDto> challengesResponseDtoList = new ArrayList<>();
 
         for (Challenge challenge : challengePage) {
             List<String> challengeImages = new ArrayList<>();
@@ -410,11 +371,11 @@ public class ChallengeService {
             String status = challengeStatus(challenge);
             ChallengesResponseDto responseDto = new ChallengesResponseDto(challenge, challengeImages);
             responseDto.setStatus(status);
-            challengesResponseDtos.add(responseDto);
+            challengesResponseDtoList.add(responseDto);
 
         }
         ChallengePageResponseDto challengePageResponseDto = ChallengePageResponseDto.builder()
-                .challengeList(challengesResponseDtos)
+                .challengeList(challengesResponseDtoList)
                 .next(challengePage.hasNext())
                 .totalCnt(challengePage.getTotalElements())
                 .build();
@@ -652,7 +613,7 @@ public class ChallengeService {
             List<UserChallenge> userChallenges = userChallengeRepository.findAllByChallenge(challenge);
             challenge.setCurrentMember(userChallenges.size());
             challengeRepository.save(challenge);
-          
+
         } else {
             throw new InvalidException("비밀번호가 틀렸습니다");
         }
